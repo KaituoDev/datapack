@@ -385,7 +385,7 @@ with open(path, 'w', encoding='utf-8') as f:
     f.write('    },\n')
     f.write('    "result": "minecraft:deepslate",\n')
     f.write('    "experience": 0.5,\n')
-    f.write('    "cookingtime": 10\n')
+    f.write('    "cookingtime": 2\n')
     f.write('}\n')
 
 zipfile = zipfile.ZipFile('kaituo.zip', 'w')
