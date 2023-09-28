@@ -122,7 +122,7 @@ with open(path, 'w', encoding='utf-8') as f:
     f.write('        "s": {"item": "minecraft:saddle"}\n')
     f.write('    },\n')
     f.write('    "result": {\n')
-    f.write('        "item": "minecraft:chest",\n')
+    f.write('        "item": "minecraft:elytra",\n')
     f.write('        "count": 2\n')
     f.write('    }\n')
     f.write('}\n')
