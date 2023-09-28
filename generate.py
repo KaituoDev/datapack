@@ -3,18 +3,20 @@ import zipfile
 
 # preparations
 
-WOOD_TYPES = [    # all wood types in 1.20
+NORMAL_WOOD_TYPES = [    # all wood types in 1.20
     'oak',
     'spruce',
     'birch',
     'jungle',
     'acacia',
     'dark_oak',
-    'crimson',
-    'warped',
     'mangrove',
-    'cherry',
-    'bamboo'
+    'cherry'
+]
+
+NETHER_WOOD_TYPES = [
+    'crimson',
+    'warped'
 ]
 
 PACK_FORMAT = 15    # 1.20.1
@@ -44,36 +46,230 @@ if not os.path.exists('data/kaituo/recipes'):
 
 # generate stone cutting recipes
 
-for woodtype in WOOD_TYPES:
+path = f'data/kaituo/recipes/stick_cutting.json'
+FILES.append(path)
+with open(path, 'w', encoding='utf-8') as f:
+    f.write( '{\n')
+    f.write( '    "type": "minecraft:stonecutting",\n')
+    f.write( '    "ingredient": {\n')
+    f.write(f'        "tag": "minecraft:logs"\n')
+    f.write( '    },\n')
+    f.write(f'    "result": "minecraft:stick",\n')
+    f.write( '    "count": 8\n')
+    f.write( '}\n')
 
-    # planks -> slabs
+for woodtype in NORMAL_WOOD_TYPES:
+
+    # logs -> fence (1:3)
+
+    path = f'data/kaituo/recipes/{woodtype}_fence_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_fence",\n')
+        f.write( '    "count": 3\n')
+        f.write( '}\n')
+
+    # logs -> fence gate (1:1)
+
+    path = f'data/kaituo/recipes/{woodtype}_fence_gate_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_fence_gate",\n')
+        f.write( '    "count": 1\n')
+        f.write( '}\n')
+
+    # logs -> sign (1:2)
+
+    path = f'data/kaituo/recipes/{woodtype}_sign_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_sign",\n')
+        f.write( '    "count": 2\n')
+        f.write( '}\n')
+
+    # logs -> stair (1:4)
+
+    path = f'data/kaituo/recipes/{woodtype}_stair_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_stair",\n')
+        f.write( '    "count": 4\n')
+        f.write( '}\n')
+
+    # logs -> planks (1:4)
+
+    path = f'data/kaituo/recipes/{woodtype}_planks_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_planks",\n')
+        f.write( '    "count": 4\n')
+        f.write( '}\n')
+
+    # logs -> trapdoor (1:2)
+
+    path = f'data/kaituo/recipes/{woodtype}_trapdoor_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_trapdoor",\n')
+        f.write( '    "count": 2\n')
+        f.write( '}\n')
+
+    # logs -> slabs (1:8)
 
     path = f'data/kaituo/recipes/{woodtype}_slab_cutting.json'
     FILES.append(path)
     with open(path, 'w', encoding='utf-8') as f:
         f.write( '{\n')
         f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_planks_cutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
         f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_planks"\n')
+        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
         f.write( '    },\n')
         f.write(f'    "result": "minecraft:{woodtype}_slab",\n')
-        f.write( '    "count": 2\n')
+        f.write( '    "count": 8\n')
         f.write( '}\n')
 
-    # planks -> stairs
+for woodtype in NETHER_WOOD_TYPES:
 
-    path = f'data/kaituo/recipes/{woodtype}_stairs_cutting.json'
+    # logs -> fence (1:3)
+
+    path = f'data/kaituo/recipes/{woodtype}_fence_cutting.json'
     FILES.append(path)
     with open(path, 'w', encoding='utf-8') as f:
         f.write( '{\n')
         f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_planks_cutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
         f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_planks"\n')
+        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
         f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_stairs",\n')
+        f.write(f'    "result": "minecraft:{woodtype}_fence",\n')
+        f.write( '    "count": 3\n')
+        f.write( '}\n')
+
+    # logs -> fence gate (1:1)
+
+    path = f'data/kaituo/recipes/{woodtype}_fence_gate_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_fence_gate",\n')
         f.write( '    "count": 1\n')
+        f.write( '}\n')
+
+    # logs -> sign (1:2)
+
+    path = f'data/kaituo/recipes/{woodtype}_sign_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_sign",\n')
+        f.write( '    "count": 2\n')
+        f.write( '}\n')
+
+    # logs -> stair (1:4)
+
+    path = f'data/kaituo/recipes/{woodtype}_stair_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_stair",\n')
+        f.write( '    "count": 4\n')
+        f.write( '}\n')
+
+    # logs -> planks (1:4)
+
+    path = f'data/kaituo/recipes/{woodtype}_planks_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_planks",\n')
+        f.write( '    "count": 4\n')
+        f.write( '}\n')
+
+    # logs -> trapdoor (1:2)
+
+    path = f'data/kaituo/recipes/{woodtype}_trapdoor_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_trapdoor",\n')
+        f.write( '    "count": 2\n')
+        f.write( '}\n')
+
+    # logs -> slabs (1:8)
+
+    path = f'data/kaituo/recipes/{woodtype}_slab_cutting.json'
+    FILES.append(path)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write( '{\n')
+        f.write( '    "type": "minecraft:stonecutting",\n')
+        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
+        f.write( '    "ingredient": {\n')
+        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
+        f.write( '    },\n')
+        f.write(f'    "result": "minecraft:{woodtype}_slab",\n')
+        f.write( '    "count": 8\n')
         f.write( '}\n')
 
 # generate crafting recipes
