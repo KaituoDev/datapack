@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import zipfile
 
 # preparations
@@ -35,14 +35,12 @@ with open('pack.mcmeta', 'w', encoding='utf-8') as f:
 
 # make directories
 
-if not os.path.exists('data'):
-    os.mkdir('data')
+for pathname in ['data', 'data/kaituo', 'data/kaituo/recipes']:
 
-if not os.path.exists('data/kaituo'):
-    os.mkdir('data/kaituo')
+    p = Path(pathname)
 
-if not os.path.exists('data/kaituo/recipes'):
-    os.mkdir('data/kaituo/recipes')
+    if not p.exists():
+        p.mkdir()
 
 # generate stone cutting recipes
 
