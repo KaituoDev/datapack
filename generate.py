@@ -114,7 +114,7 @@ for woodtype in NORMAL_WOOD_TYPES:
         f.write( '    "ingredient": {\n')
         f.write(f'        "item": "minecraft:{woodtype}_log"\n')
         f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_stair",\n')
+        f.write(f'    "result": "minecraft:{woodtype}_stairs",\n')
         f.write( '    "count": 4\n')
         f.write( '}\n')
 
@@ -221,7 +221,7 @@ for woodtype in NETHER_WOOD_TYPES:
         f.write( '    "ingredient": {\n')
         f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
         f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_stair",\n')
+        f.write(f'    "result": "minecraft:{woodtype}_stairs",\n')
         f.write( '    "count": 4\n')
         f.write( '}\n')
 
