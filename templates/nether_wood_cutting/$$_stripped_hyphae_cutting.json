@@ -1,0 +1,9 @@
+{
+    "type": "minecraft:stonecutting",
+    "group": "minecraft:$$_wood_cutting",
+    "ingredient": {
+        "item": "minecraft:$$_hyphae"
+    },
+    "result": "minecraft:stripped_$$_hyphae",
+    "count": 1
+}

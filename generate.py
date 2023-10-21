@@ -1,589 +1,115 @@
+from os import getcwd
 from pathlib import Path
+import shutil
 import zipfile
+import argparse
+import json
 
-# preparations
+# parse arguments
 
-NORMAL_WOOD_TYPES = [    # all wood types in 1.20
-    'oak',
-    'spruce',
-    'birch',
-    'jungle',
-    'acacia',
-    'dark_oak',
-    'mangrove',
-    'cherry'
-]
+parser = argparse.ArgumentParser(description='Generate templated datapack.')
 
-NETHER_WOOD_TYPES = [
-    'crimson',
-    'warped'
-]
+parser.add_argument('--namespace', '-n', dest='namespace', help='the custom namespace to use', default='kaituo')
+parser.add_argument('--recipe_templates', '--rt', '-t', dest='recipe_template_folder', help='recipe template folder', default='templates')
+parser.add_argument('--out', '-o', dest='output_folder', help='output folder', default='out')
+parser.add_argument('--pack-format', '-f', type=int, dest='pack_format', help='pack format number', default=15)
+parser.add_argument('--output-zip-name', '-z', dest='output_zip_name', help='output zip name', default='kaituo.zip')
+parser.add_argument('--verbose', '-v', dest='verbose', action='store_true', help='show verbose output')
+parser.add_argument('--no-cleanup', '-c', dest='cleanup', action='store_false', help='stop clean up output folder after generating')
 
-PACK_FORMAT = 15    # 1.20.1
+args = parser.parse_args()
 
+# record the files
+
+CWD = getcwd()
 FILES = []
-
-# generate pack.mcmeta
-
-with open('pack.mcmeta', 'w', encoding='utf-8') as f:
-    f.write( '{\n')
-    f.write( '    "pack": {\n')
-    f.write(f'        "pack_format": {PACK_FORMAT},\n')
-    f.write( '        "description": "Kaituo Datapack"\n')
-    f.write( '    }\n')
-    f.write( '}\n')
 
 # make directories
 
-for pathname in ['data', 'data/kaituo', 'data/kaituo/recipes']:
+out_path = Path(args.output_folder)
+if not out_path.exists():
+    out_path.mkdir()
 
-    p = Path(pathname)
+data_path = out_path.joinpath('data')
+if not data_path.exists():
+    data_path.mkdir()
 
+namespace_path = data_path.joinpath(args.namespace)
+if not namespace_path.exists():
+    namespace_path.mkdir()
+# categories = [            # for later use
+#     'advancements',
+#     'functions',
+#     'loot_tables',
+#     'predicates',
+#     'recipes',
+#     'item_modifers',
+#     'structures',
+#     'tags'
+# ]
+categories = ['recipes']
+for category in categories:
+    p = namespace_path.joinpath(category)
     if not p.exists():
         p.mkdir()
-
-# generate stone cutting recipes
-
-path = f'data/kaituo/recipes/stick_cutting.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write( '{\n')
-    f.write( '    "type": "minecraft:stonecutting",\n')
-    f.write( '    "ingredient": {\n')
-    f.write(f'        "tag": "minecraft:logs"\n')
-    f.write( '    },\n')
-    f.write(f'    "result": "minecraft:stick",\n')
-    f.write( '    "count": 8\n')
-    f.write( '}\n')
-
-for woodtype in NORMAL_WOOD_TYPES:
-
-    # logs -> fence (1:3)
-
-    path = f'data/kaituo/recipes/{woodtype}_fence_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_fence",\n')
-        f.write( '    "count": 3\n')
-        f.write( '}\n')
-
-    # logs -> fence gate (1:1)
-
-    path = f'data/kaituo/recipes/{woodtype}_fence_gate_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_fence_gate",\n')
-        f.write( '    "count": 1\n')
-        f.write( '}\n')
-
-    # logs -> sign (1:2)
-
-    path = f'data/kaituo/recipes/{woodtype}_sign_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_sign",\n')
-        f.write( '    "count": 2\n')
-        f.write( '}\n')
-
-    # logs -> stair (1:4)
-
-    path = f'data/kaituo/recipes/{woodtype}_stair_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_stairs",\n')
-        f.write( '    "count": 4\n')
-        f.write( '}\n')
-
-    # logs -> planks (1:4)
-
-    path = f'data/kaituo/recipes/{woodtype}_planks_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_planks",\n')
-        f.write( '    "count": 4\n')
-        f.write( '}\n')
-
-    # logs -> trapdoor (1:2)
-
-    path = f'data/kaituo/recipes/{woodtype}_trapdoor_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_trapdoor",\n')
-        f.write( '    "count": 2\n')
-        f.write( '}\n')
-
-    # logs -> slabs (1:8)
-
-    path = f'data/kaituo/recipes/{woodtype}_slab_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_log"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_slab",\n')
-        f.write( '    "count": 8\n')
-        f.write( '}\n')
-
-for woodtype in NETHER_WOOD_TYPES:
-
-    # logs -> fence (1:3)
-
-    path = f'data/kaituo/recipes/{woodtype}_fence_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_fence",\n')
-        f.write( '    "count": 3\n')
-        f.write( '}\n')
-
-    # logs -> fence gate (1:1)
-
-    path = f'data/kaituo/recipes/{woodtype}_fence_gate_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_fence_gate",\n')
-        f.write( '    "count": 1\n')
-        f.write( '}\n')
-
-    # logs -> sign (1:2)
-
-    path = f'data/kaituo/recipes/{woodtype}_sign_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_sign",\n')
-        f.write( '    "count": 2\n')
-        f.write( '}\n')
-
-    # logs -> stair (1:4)
-
-    path = f'data/kaituo/recipes/{woodtype}_stair_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_stairs",\n')
-        f.write( '    "count": 4\n')
-        f.write( '}\n')
-
-    # logs -> planks (1:4)
-
-    path = f'data/kaituo/recipes/{woodtype}_planks_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_planks",\n')
-        f.write( '    "count": 4\n')
-        f.write( '}\n')
-
-    # logs -> trapdoor (1:2)
-
-    path = f'data/kaituo/recipes/{woodtype}_trapdoor_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_trapdoor",\n')
-        f.write( '    "count": 2\n')
-        f.write( '}\n')
-
-    # logs -> slabs (1:8)
-
-    path = f'data/kaituo/recipes/{woodtype}_slab_cutting.json'
-    FILES.append(path)
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write( '{\n')
-        f.write( '    "type": "minecraft:stonecutting",\n')
-        f.write(f'    "group": "minecraft:{woodtype}_wood_cutting",\n')
-        f.write( '    "ingredient": {\n')
-        f.write(f'        "item": "minecraft:{woodtype}_stem"\n')
-        f.write( '    },\n')
-        f.write(f'    "result": "minecraft:{woodtype}_slab",\n')
-        f.write( '    "count": 8\n')
-        f.write( '}\n')
-
-# generate crafting recipes
-
-# shaped
-
-# logs -> chest
-
-path = 'data/kaituo/recipes/chest_from_logs.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "lll",\n')
-    f.write('        "l l",\n')
-    f.write('        "lll"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "l": {"tag": "minecraft:logs"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:chest",\n')
-    f.write('        "count": 8\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# dupe elytra
-
-path = 'data/kaituo/recipes/elytra_duplication.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "pcp",\n')
-    f.write('        "pep",\n')
-    f.write('        "psp"\n')
-    f.write('    ],')
-    f.write('    "key": {\n')
-    f.write('        "p": {"item": "minecraft:phantom_membrane"},\n')
-    f.write('        "c": {"item": "minecraft:chorus_fruit"},\n')
-    f.write('        "e": {"item": "minecraft:elytra"},\n')
-    f.write('        "s": {"item": "minecraft:saddle"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:elytra",\n')
-    f.write('        "count": 2\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# dupe shulker
-
-path = 'data/kaituo/recipes/shulker_duplication.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "csc",\n')
-    f.write('        "cfc",\n')
-    f.write('        "csc"\n')
-    f.write('    ],')
-    f.write('    "key": {\n')
-    f.write('        "c": {"item": "minecraft:chorus_fruit"},\n')
-    f.write('        "f": {"item": "minecraft:chorus_flower"},\n')
-    f.write('        "s": {"item": "minecraft:shulker_shell"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:shulker_shell",\n')
-    f.write('        "count": 3\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# wool -> sponge
-
-path = 'data/kaituo/recipes/sponge_from_wool.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "ww",\n')
-    f.write('        "ww"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "w": {"item": "minecraft:white_wool"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:sponge",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# rotten flesh -> crimson stems
-
-path = 'data/kaituo/recipes/crimson_stems_from_rotten_flesh.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "ff",\n')
-    f.write('        "ff"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "f": {"item": "minecraft:rotten_flesh"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:crimson_stem",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# bone -> warped stems
-
-path = 'data/kaituo/recipes/warped_stems_from_bone.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "bb",\n')
-    f.write('        "bb"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "b": {"item": "minecraft:bone"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:warped_stem",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# bone meal -> bone blocks
-
-path = 'data/kaituo/recipes/bone_blocks_from_bone_meal.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "bbb",\n')
-    f.write('        "bbb",\n')
-    f.write('        "bbb"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "b": {"item": "minecraft:bone_meal"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:bone_block",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# enchanted golden apple
-
-path = 'data/kaituo/recipes/enchanted_golden_apple.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "ggg",\n')
-    f.write('        "gag",\n')
-    f.write('        "ggg"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "g": {"item": "minecraft:gold_block"},\n')
-    f.write('        "a": {"item": "minecraft:apple"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:enchanted_golden_apple",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# fast dispenser
-
-path = 'data/kaituo/recipes/dispenser_fast.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "sl ",\n')
-    f.write('        "sdl",\n')
-    f.write('        "sl "\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "s": {"item": "minecraft:string"},\n')
-    f.write('        "l": {"item": "minecraft:stick"},\n')
-    f.write('        "d": {"item": "minecraft:dropper"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:dispenser",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# fast minecarts
-
-# chest minecart
-
-path = 'data/kaituo/recipes/chest_minecart.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "iXi",\n')
-    f.write('        "iii"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "i": {"item": "minecraft:iron_ingot"},\n')
-    f.write('        "X": {"item": "minecraft:chest"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:chest_minecart",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# furnace minecart
-
-path = 'data/kaituo/recipes/furnace_minecart.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "iXi",\n')
-    f.write('        "iii"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "i": {"item": "minecraft:iron_ingot"},\n')
-    f.write('        "X": {"item": "minecraft:furnace"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:furnace_minecart",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# tnt minecart
-
-path = 'data/kaituo/recipes/tnt_minecart.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "iXi",\n')
-    f.write('        "iii"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "i": {"item": "minecraft:iron_ingot"},\n')
-    f.write('        "X": {"item": "minecraft:tnt"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:tnt_minecart",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# hopper minecart
-
-path = 'data/kaituo/recipes/hopper_minecart.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:crafting_shaped",\n')
-    f.write('    "category": "misc",\n')
-    f.write('    "pattern": [\n')
-    f.write('        "iXi",\n')
-    f.write('        "iii"\n')
-    f.write('    ],\n')
-    f.write('    "key": {\n')
-    f.write('        "i": {"item": "minecraft:iron_ingot"},\n')
-    f.write('        "X": {"item": "minecraft:hopper"}\n')
-    f.write('    },\n')
-    f.write('    "result": {\n')
-    f.write('        "item": "minecraft:hopper_minecart",\n')
-    f.write('        "count": 1\n')
-    f.write('    }\n')
-    f.write('}\n')
-
-# fast blasting deepslate cobble
-
-path = 'data/kaituo/recipes/deepslate_blasting_deepslate_cobble_fast.json'
-FILES.append(path)
-with open(path, 'w', encoding='utf-8') as f:
-    f.write('{\n')
-    f.write('    "type": "minecraft:blasting",\n')
-    f.write('    "ingredient": {\n')
-    f.write('        "item": "minecraft:cobbled_deepslate"\n')
-    f.write('    },\n')
-    f.write('    "result": "minecraft:deepslate",\n')
-    f.write('    "experience": 0.5,\n')
-    f.write('    "cookingtime": 2\n')
-    f.write('}\n')
-
-zipfile = zipfile.ZipFile('kaituo.zip', 'w')
+    else:
+        shutil.rmtree(p)
+        p.mkdir()
+
+# generate pack.mcmeta
+
+pack_meta_path = out_path.joinpath("pack.mcmeta")
+pack_meta_path.write_text(f"""{{
+    'pack': {{
+        'pack_format': {args.pack_format},
+        'description': 'Kaituo Datapack'
+    }}
+}}
+""")
+FILES.append(pack_meta_path.absolute().relative_to(CWD))
+if args.verbose:
+    print('[generate.py] generated pack.mcmeta')
+
+# generate recipe from templates
+
+templates_path = Path(args.recipe_template_folder).absolute()
+
+for daf_path in templates_path.iterdir():
+    if daf_path.is_file() and daf_path.suffix == '.json':
+        dest = namespace_path.joinpath("recipes/").joinpath(daf_path.name)
+        shutil.copy(daf_path, dest)
+        FILES.append(dest.absolute().relative_to(CWD))
+        if args.verbose:
+            print(f'[generate.py] generated {dest.name}')
+    elif daf_path.is_dir() and daf_path.joinpath("enum.json").exists():
+        enum = daf_path.joinpath("enum.json").read_text(encoding='utf-8')
+        enum = json.loads(enum)
+        recipes: list[Path] = []
+        for recipe in daf_path.glob("**/*"):
+            if recipe.is_file() and recipe.suffix == '.json':
+                if recipe.name == "enum.json":
+                    continue
+                recipes.append(recipe)
+        for item in enum:
+            for recipe in recipes:
+                content = recipe.read_text(encoding='utf-8')
+                content = content.replace("$$", item)
+                dest = namespace_path.joinpath("recipes/").joinpath(recipe.absolute().relative_to(templates_path).name.replace("$$", item))
+                dest.write_text(content, encoding='utf-8')
+                FILES.append(dest.absolute().relative_to(CWD))
+                if args.verbose:
+                    print(f'[generate.py] generated {dest.name}')
+
+# pack files into a zip
+
+out_zip_path = out_path.joinpath(args.output_zip_name)
+outzip = zipfile.ZipFile(out_zip_path, 'w')
 for file in FILES:
-    zipfile.write(file)
-zipfile.write("pack.mcmeta")
-zipfile.close()
+    outzip.write(file, file.absolute().relative_to(out_path.absolute()))
+outzip.close()
+
+# clean up
+
+if args.cleanup:
+    shutil.rmtree(data_path)
+    pack_meta_path.unlink()

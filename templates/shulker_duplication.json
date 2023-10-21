@@ -1,0 +1,17 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "misc",
+    "pattern": [
+        "csc",
+        "cfc",
+        "csc"
+    ],    "key": {
+        "c": {"item": "minecraft:chorus_fruit"},
+        "f": {"item": "minecraft:chorus_flower"},
+        "s": {"item": "minecraft:shulker_shell"}
+    },
+    "result": {
+        "item": "minecraft:shulker_shell",
+        "count": 3
+    }
+}

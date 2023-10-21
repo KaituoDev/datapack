@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "group": "minecraft:$$_wood_cutting",
+  "ingredient": {
+    "item": "minecraft:$$_stem"
+  },
+  "result": "minecraft:$$_trapdoor",
+  "count": 2
+}

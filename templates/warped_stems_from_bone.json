@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "misc",
+    "pattern": [
+        "bb",
+        "bb"
+    ],
+    "key": {
+        "b": {"item": "minecraft:bone"}
+    },
+    "result": {
+        "item": "minecraft:warped_stem",
+        "count": 1
+    }
+}

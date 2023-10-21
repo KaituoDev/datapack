@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "misc",
+    "pattern": [
+        "pcp",
+        "pep",
+        "psp"
+    ],    "key": {
+        "p": {"item": "minecraft:phantom_membrane"},
+        "c": {"item": "minecraft:chorus_fruit"},
+        "e": {"item": "minecraft:elytra"},
+        "s": {"item": "minecraft:saddle"}
+    },
+    "result": {
+        "item": "minecraft:elytra",
+        "count": 2
+    }
+}

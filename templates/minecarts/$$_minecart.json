@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "category": "misc",
+    "pattern": [
+        "iXi",
+        "iii"
+    ],
+    "key": {
+        "i": {"item": "minecraft:iron_ingot"},
+        "X": {"item": "minecraft:$$"}
+    },
+    "result": {
+        "item": "minecraft:$$_minecart",
+        "count": 1
+    }
+}
