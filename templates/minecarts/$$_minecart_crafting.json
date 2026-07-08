@@ -10,7 +10,7 @@
     "X": "minecraft:$$"
   },
   "result": {
-    "item": "minecraft:$$_minecart",
+    "id": "minecraft:$$_minecart",
     "count": 1
   }
 }

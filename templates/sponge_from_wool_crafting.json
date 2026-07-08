@@ -12,7 +12,7 @@
     "minecraft:resin_clump"
   ],
   "result": {
-    "item": "minecraft:sponge",
+    "id": "minecraft:sponge",
     "count": 2
   }
 }

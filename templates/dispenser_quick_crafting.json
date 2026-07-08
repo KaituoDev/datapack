@@ -12,7 +12,7 @@
     "d": "minecraft:dropper"
   },
   "result": {
-    "item": "minecraft:dispenser",
+    "id": "minecraft:dispenser",
     "count": 1
   }
 }

@@ -40,12 +40,12 @@ namespace_path.mkdir(exist_ok=True)
 #     'functions',
 #     'loot_tables',
 #     'predicates',
-#     'recipes',
+#     'recipe',
 #     'item_modifers',
 #     'structures',
 #     'tags'
 # ]
-categories = ['recipes']
+categories = ['recipe']
 for category in categories:
     p = namespace_path / category
     if p.exists():
@@ -54,13 +54,14 @@ for category in categories:
 # generate pack.mcmeta
 
 pack_meta_path = out_path / 'pack.mcmeta'
-pack_meta_path.write_text(f"""{{
-    'pack': {{
-        'pack_format': {args.pack_format},
-        'description': 'Kaituo Datapack'
-    }}
-}}
-""")
+with open(pack_meta_path, "w") as f:
+    json.dump({
+        "pack": {
+            "description": "Kaituo datapack",
+            "min_format": args.pack_format,
+            "max_format": args.pack_format
+        }
+    }, f, indent=2)
 FILES = [pack_meta_path.absolute().relative_to(CWD)]
 if args.verbose:
     print(f'[{__file__}] generated pack.mcmeta')
@@ -71,7 +72,7 @@ templates_path = Path(args.recipe_template_folder).absolute()
 
 for daf_path in templates_path.iterdir():
     if daf_path.is_file() and daf_path.suffix == '.json':
-        dest = namespace_path / 'recipes' / daf_path.name
+        dest = namespace_path / 'recipe' / daf_path.name
         shutil.copy(daf_path, dest)
         FILES.append(dest.absolute().relative_to(CWD))
         if args.verbose:
@@ -90,7 +91,7 @@ for daf_path in templates_path.iterdir():
                 content = recipe.read_text(encoding='utf-8')
                 content = content.replace("$$", item)
                 dest = (
-                        namespace_path / 'recipes' /
+                        namespace_path / 'recipe' /
                         recipe.absolute().relative_to(templates_path).name.replace("$$", item)
                 )
                 dest.write_text(content, encoding='utf-8')
