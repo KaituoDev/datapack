@@ -1,6 +1,6 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:$$_stem",
+  "ingredient": "minecraft:$$_block",
   "result": {
     "id": "minecraft:$$_planks",
     "count": 4

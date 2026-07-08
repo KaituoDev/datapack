@@ -1,9 +1,8 @@
 {
-    "type": "minecraft:stonecutting",
-    "group": "minecraft:$$_wood_cutting",
-    "ingredient": {
-        "item": "minecraft:$$_log"
-    },
-    "result": "minecraft:$$_slab",
+  "type": "minecraft:stonecutting",
+  "ingredient": "minecraft:$$_log",
+  "result": {
+    "id": "minecraft:$$_slab",
     "count": 8
+  }
 }

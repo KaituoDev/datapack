@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CC",
+    "CC"
+  ],
+  "key": {
+    "C": "minecraft:$$_coral"
+  },
+  "result": {
+    "id": "minecraft:$$_coral_block",
+    "count": 1
+  },
+  "category": "building"
+}

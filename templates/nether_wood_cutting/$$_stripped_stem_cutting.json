@@ -1,9 +1,8 @@
 {
   "type": "minecraft:stonecutting",
-  "group": "minecraft:$$_wood_cutting",
-  "ingredient": {
-    "item": "minecraft:$$_stem"
-  },
-  "result": "minecraft:stripped_$$_stem",
-  "count": 1
+  "ingredient": "minecraft:$$_stem",
+  "result": {
+    "id": "minecraft:stripped_$$_stem",
+    "count": 1
+  }
 }

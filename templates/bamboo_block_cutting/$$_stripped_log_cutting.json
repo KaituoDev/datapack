@@ -1,6 +1,6 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:$$_log",
+  "ingredient": "minecraft:$$_block",
   "result": {
     "id": "minecraft:stripped_$$_log",
     "count": 1

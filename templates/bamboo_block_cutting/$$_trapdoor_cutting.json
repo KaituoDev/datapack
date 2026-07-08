@@ -1,8 +1,8 @@
 {
   "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:$$_log",
+  "ingredient": "minecraft:$$_block",
   "result": {
-    "id": "minecraft:$$_sign",
+    "id": "minecraft:$$_trapdoor",
     "count": 2
   }
 }
