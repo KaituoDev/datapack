@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": "minecraft:$$_wood",
-  "result": {
-    "id": "minecraft:stripped_$$_wood",
-    "count": 1
-  }
-}
