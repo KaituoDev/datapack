@@ -1,17 +1,22 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "pattern": [
-    "ggg",
-    "gag",
-    "ggg"
-  ],
-  "key": {
-    "g": "minecraft:gold_block",
-    "a": "minecraft:golden_apple"
-  },
-  "result": {
-    "id": "minecraft:enchanted_golden_apple",
-    "count": 1
-  }
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "ggg",
+        "gag",
+        "ggg"
+    ],
+    "key": {
+        "g":"minecraft:gold_block",
+        "a":"minecraft:golden_apple"
+    },
+    "result": {
+      "id": "minecraft:enchanted_golden_apple",
+      "count": 1,
+      "components": {
+            "minecraft:lore": [
+                {"text": "人工合成", "bold": true, "italic": false, "color": "blue"}
+            ]
+        }
+    },
+    "category": "misc"
 }
