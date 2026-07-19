@@ -3,13 +3,14 @@
   "category": "misc",
   "ingredients": [
     "#minecraft:wool",
-    "#minecraft:wool",
-    "#minecraft:wool",
+    "minecraft:resin_clump",
     "#minecraft:wool",
     "minecraft:resin_clump",
+    "#minecraft:wool",
     "minecraft:resin_clump",
+    "#minecraft:wool",
     "minecraft:resin_clump",
-    "minecraft:resin_clump"
+    "#minecraft:wool"
   ],
   "result": {
     "id": "minecraft:sponge",
