@@ -1,4 +1,5 @@
 from os import getcwd
+from os.path import exists
 from pathlib import Path
 import shutil
 import zipfile
@@ -7,102 +8,169 @@ import json
 
 # parse arguments
 
-parser = argparse.ArgumentParser(description='Generate templated datapack.')
+parser = argparse.ArgumentParser(description="Generate templated datapack.")
 
-parser.add_argument('--namespace', '-n', dest='namespace', help='the custom namespace to use', default='kaituo')
-parser.add_argument('--recipe_templates', '--rt', '-t', dest='recipe_template_folder', help='recipe template folder',
-                    default='templates')
-parser.add_argument('--out', '-o', dest='output_folder', help='output folder', default='out')
-parser.add_argument('--pack-format', '-f', type=int, dest='pack_format', help='pack format number', default=15)
-parser.add_argument('--output-zip-name', '-z', dest='output_zip_name', help='output zip name', default='kaituo.zip')
-parser.add_argument('--verbose', '-v', dest='verbose', action='store_true', help='show verbose output')
-parser.add_argument('--no-cleanup', '-c', dest='cleanup', action='store_false',
-                    help='stop clean up output folder after generating')
+parser.add_argument(
+    "--namespace",
+    "-n",
+    dest="namespace",
+    help="the custom namespace to use",
+    default="kaituo",
+)
+parser.add_argument(
+    "--templates",
+    "-t",
+    dest="template_folder",
+    help="template folder",
+    default="templates",
+)
+parser.add_argument(
+    "--out", "-o", dest="output_folder", help="output folder", default="out"
+)
+parser.add_argument(
+    "--pack-format",
+    "-f",
+    type=int,
+    dest="pack_format",
+    help="pack format number",
+    default=15,
+)
+parser.add_argument(
+    "--output-zip-name",
+    "-z",
+    dest="output_zip_name",
+    help="output zip name",
+    default="kaituo.zip",
+)
+parser.add_argument(
+    "--verbose", "-v", dest="verbose", action="store_true", help="show verbose output"
+)
+parser.add_argument(
+    "--no-cleanup",
+    "-c",
+    dest="cleanup",
+    action="store_false",
+    help="stop clean up output folder after generating",
+)
 
 args = parser.parse_args()
 
 # record the files
-
+FILES: list[Path] = []
 CWD = getcwd()
+
 # make directories
 
 out_path = Path(args.output_folder)
 out_path.mkdir(exist_ok=True)
 
-data_path = out_path / 'data'
+data_path = out_path / "data"
 data_path.mkdir(exist_ok=True)
 
-namespace_path = data_path / args.namespace
+namespace_path = data_path / str(args.namespace)
 namespace_path.mkdir(exist_ok=True)
 
-# categories = [            # for later use
-#     'advancements',
-#     'functions',
-#     'loot_tables',
-#     'predicates',
-#     'recipe',
-#     'item_modifers',
-#     'structures',
-#     'tags'
-# ]
-categories = ['recipe']
+categories = [
+    "function",
+    "structure",
+    "tags",
+    "advancement",
+    "item_modifier",
+    "loot_table",
+    "number_provider",
+    "predicate",
+    "recipe",
+    "slot_source",
+]
 for category in categories:
-    p = namespace_path / category
-    if p.exists():
-        shutil.rmtree(p)
-    p.mkdir()
+    path = namespace_path / category
+    if path.exists():
+        shutil.rmtree(path)
+
 # generate pack.mcmeta
 
-pack_meta_path = out_path / 'pack.mcmeta'
+pack_meta_path = out_path / "pack.mcmeta"
 with open(pack_meta_path, "w") as f:
-    json.dump({
-        "pack": {
-            "description": "Kaituo datapack",
-            "min_format": args.pack_format,
-            "max_format": args.pack_format
-        }
-    }, f, indent=2)
-FILES = [pack_meta_path.absolute().relative_to(CWD)]
+    json.dump(
+        {
+            "pack": {
+                "description": "Kaituo datapack",
+                "min_format": args.pack_format,
+                "max_format": args.pack_format,
+            }
+        },
+        f,
+        indent=2,
+    )
+FILES.append(pack_meta_path)
 if args.verbose:
-    print(f'[{__file__}] generated pack.mcmeta')
+    print(f"[{__file__}] generated pack.mcmeta")
 
-# generate recipe from templates
+# generate from templates
 
-templates_path = Path(args.recipe_template_folder).absolute()
+templates_path = Path(args.template_folder).absolute()
 
-for daf_path in templates_path.iterdir():
-    if daf_path.is_file() and daf_path.suffix == '.json':
-        dest = namespace_path / 'recipe' / daf_path.name
-        shutil.copy(daf_path, dest)
-        FILES.append(dest.absolute().relative_to(CWD))
-        if args.verbose:
-            print(f'[{__file__}] generated {dest.name}')
-    elif daf_path.is_dir() and (daf_path / 'enum.json').exists():
-        enum = daf_path.joinpath("enum.json").read_text(encoding='utf-8')
-        enum = json.loads(enum)
-        recipes: list[Path] = []
-        for recipe in daf_path.glob("**/*"):
-            if recipe.is_file() and recipe.suffix == '.json':
-                if recipe.name == "enum.json":
-                    continue
-                recipes.append(recipe)
-        for item in enum:
-            for recipe in recipes:
-                content = recipe.read_text(encoding='utf-8')
-                content = content.replace("$$", item)
-                dest = (
-                        namespace_path / 'recipe' /
-                        recipe.absolute().relative_to(templates_path).name.replace("$$", item)
-                )
-                dest.write_text(content, encoding='utf-8')
-                FILES.append(dest.absolute().relative_to(CWD))
-                if args.verbose:
-                    print(f'[{__file__}] generated {dest.name}')
+
+def get_suffix(category: str) -> str:
+    match category:
+        case "function":
+            return ".mcfunction"
+        case "structure":
+            return ".nbt"
+        case _:
+            return ".json"
+
+
+def write_file(src: Path, content: str | None = None):
+    dest = namespace_path / src.relative_to(templates_path)
+    if not dest.parent.exists():
+        dest.parent.mkdir(parents=True, exist_ok=True)
+    if content:
+        dest.write_text(content, encoding="utf-8")
+    else:
+        dest.write_bytes(src.read_bytes())
+    FILES.append(dest)
+    if args.verbose:
+        print(f"[{__file__}] generated {dest.relative_to(data_path)}")
+
+
+def do_templates(dir_path: Path, category: str):
+    enum_json = (dir_path / "enum.json").read_text(encoding="utf-8")
+    enum = json.loads(enum_json)
+    for subdir_path, _, filenames in dir_path.walk():
+        for filename in filenames:
+            file_path = subdir_path / filename
+            if file_path.suffix != get_suffix(category):
+                continue
+            if filename == "enum.json":
+                continue
+            for entry in enum:
+                content = file_path.read_text(encoding="utf-8")
+                content = content.replace("$$", entry)
+                new_file_path = Path(str(file_path).replace("$$", entry))
+                write_file(new_file_path, content)
+
+
+for category in categories:
+    category_path = templates_path / category
+    if not category_path.exists():
+        continue
+
+    for dir_path, subdir_names, filenames in category_path.walk():
+        for subdir_name in subdir_names.copy():
+            subdir_path = dir_path / subdir_name
+            if (subdir_path / "enum.json").exists():
+                subdir_names.remove(subdir_name)
+                do_templates(subdir_path, category)
+        for filename in filenames:
+            file_path = dir_path / filename
+            if file_path.suffix == get_suffix(category):
+                write_file(file_path)
 
 # pack files into a zip
 
 out_zip_path = out_path / args.output_zip_name
-outzip = zipfile.ZipFile(out_zip_path, 'w')
+outzip = zipfile.ZipFile(out_zip_path, "w")
 for file in FILES:
     outzip.write(file, file.absolute().relative_to(out_path.absolute()))
 outzip.close()
