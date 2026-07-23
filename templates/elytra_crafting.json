@@ -1,25 +1,16 @@
 {
-    "type": "crafting_shaped",
-    "pattern": [
-        "RFR",
-        "MHM",
-        "MSM"
-    ],
-    "key": {
-        "M":"phantom_membrane",
-        "R":"end_rod",
-        "F":"chorus_flower",
-        "H":"dragon_head",
-        "S":"shulker_shell"
-    },
-    "result": {
-        "id": "elytra",
-        "count": 1,
-        "components": {
-            "minecraft:lore": [
-                {"text": "人工合成", "bold": true, "italic": false, "color": "blue"}
-            ]
-        }
-    },
-    "category": "equipment"
+  "type": "crafting_shaped",
+  "pattern": ["RFR", "MHM", "MSM"],
+  "key": {
+    "M": "minecraft:phantom_membrane",
+    "R": "minecraft:end_rod",
+    "F": "minecraft:chorus_flower",
+    "H": "minecraft:dragon_head",
+    "S": "minecraft:shulker_shell"
+  },
+  "result": {
+    "id": "elytra",
+    "count": 1
+  },
+  "category": "equipment"
 }
