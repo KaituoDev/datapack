@@ -1,5 +1,4 @@
 from os import getcwd
-from os.path import exists
 from pathlib import Path
 import shutil
 import zipfile
@@ -51,6 +50,14 @@ parser.add_argument(
     dest="cleanup",
     action="store_false",
     help="stop clean up output folder after generating",
+)
+parser.add_argument(
+    "--no-unlock-recipes",
+    "-u",
+    dest="unlock_recipes",
+    action="store_false",
+    default=True,
+    help="disable generating a function to unlock all custom recipes",
 )
 
 args = parser.parse_args()
@@ -166,6 +173,30 @@ for category in categories:
             file_path = dir_path / filename
             if file_path.suffix == get_suffix(category):
                 write_file(file_path)
+
+# generate unlock-all-recipes function
+
+if args.unlock_recipes:
+    recipe_files = [
+        f
+        for f in FILES
+        if f.suffix == ".json" and (namespace_path / "recipe") in f.parents
+    ]
+    lines = []
+    for rf in recipe_files:
+        recipe_name = rf.relative_to(namespace_path / "recipe").as_posix()
+        recipe_name = recipe_name.removesuffix(".json")
+        recipe_id = f"{args.namespace}:{recipe_name}"
+        lines.append(f"recipe give @s {recipe_id}")
+    unlock_function = "\n".join(lines) + "\n"
+
+    function_dir = namespace_path / "function" / "recipes"
+    function_dir.mkdir(parents=True, exist_ok=True)
+    function_path = function_dir / "unlock_all.mcfunction"
+    function_path.write_text(unlock_function, encoding="utf-8")
+    FILES.append(function_path)
+    if args.verbose:
+        print(f"[{__file__}] generated function/recipes/unlock_all.mcfunction")
 
 # pack files into a zip
 
