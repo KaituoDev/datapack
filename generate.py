@@ -1,3 +1,5 @@
+#!/bin/python3
+
 from os import getcwd
 from pathlib import Path
 import shutil
