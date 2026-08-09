@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": ["minecraft:dead_$$_coral_block"],
+  "result": {
+    "id": "minecraft:dead_$$_coral_fan",
+    "count": 4
+  },
+  "category": "building"
+}
