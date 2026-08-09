@@ -1,11 +1,9 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    "minecraft:$$_coral_fan",
-    "minecraft:$$_coral_fan",
-    "minecraft:$$_coral_fan",
-    "minecraft:$$_coral_fan"
-  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["xx", "xx"],
+  "key": {
+    "x": "minecraft:$$_coral_fan"
+  },
   "result": {
     "id": "minecraft:$$_coral_block",
     "count": 1

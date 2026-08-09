@@ -1,11 +1,7 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    "minecraft:dead_$$_coral_fan",
-    "minecraft:dead_$$_coral_fan",
-    "minecraft:dead_$$_coral_fan",
-    "minecraft:dead_$$_coral_fan"
-  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["xx", "xx"],
+  "key": { "x": "minecraft:dead_$$_coral_fan" },
   "result": {
     "id": "minecraft:dead_$$_coral_block",
     "count": 1
