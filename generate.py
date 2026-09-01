@@ -41,7 +41,7 @@ parser.add_argument(
     "-z",
     dest="output_zip_name",
     help="output zip name",
-    default="kaituo.zip",
+    default="KaituoRecipeDatapack.zip",
 )
 parser.add_argument(
     "--verbose", "-v", dest="verbose", action="store_true", help="show verbose output"
